@@ -2,16 +2,24 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-@app.route('/webhook', methods=['POST'])
+# Health check
+@app.route("/")
+def home():
+    return "Bot is running"
+
+# Webhook endpoint (TradingView sends alerts here)
+@app.route("/webhook", methods=["POST"])
 def webhook():
     data = request.json
-    score = float(data.get("ai_score", 0))
 
-    if score >= 65:
-        decision = "TAKE TRADE"
-    else:
-        decision = "SKIP TRADE"
+    print("📩 Incoming Alert:", data)
 
-    print(f"{decision} | Score: {score}")
+    # Basic parsing (you can expand later)
+    signal = data.get("signal", "NONE")
 
-    return jsonify({"decision": decision})
+    if signal == "BUY":
+        print("🟢 BUY SIGNAL RECEIVED")
+    elif signal == "SELL":
+        print("🔴 SELL SIGNAL RECEIVED")
+
+    return jsonify({"status": "received"})
